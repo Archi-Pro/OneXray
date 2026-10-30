@@ -446,6 +446,17 @@ jobs:
           ANDROID_NDK_HOME: ${{ steps.ndk.outputs.ndk-path }}
         run: uv run --project build_scripts python build_scripts/main.py OneXray android
 
+      - name: Build split APKs
+        run: |
+          flutter build apk --split-per-abi
+          mkdir -p output
+          for apk in build/app/outputs/flutter-apk/app-*-release.apk; do
+            if [ -f "$apk" ]; then
+              abi=$(basename "$apk" | sed -E 's/^app-(.*)-release\.apk$/\1/')
+              cp "$apk" "output/OneXray-android-${abi}.apk"
+            fi
+          done
+
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:

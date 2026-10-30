@@ -13,41 +13,16 @@ class AndroidBuilder(Builder):
                 "build",
                 "appbundle",
                 "--target-platform",
-                "android-arm,android-arm64,android-x86,android-x64",
+                "android-arm64,android-x64",
             ],
             cwd=self.root_dir,
         )
-        fastlane_sa = Path(self.project_dir) / "fastlane/playservice.json"
-        if fastlane_sa.exists():
-            try:
-                run_command(
-                    ["fastlane", "deploy", "--verbose"],
-                    cwd=self.project_dir,
-                    env={"ONEXRAY_BUILD_NUMBER": str(self.build_number)},
-                )
-            except Exception:
-                pass
         run_command(
-            [
-                flutter_command(),
-                "build",
-                "apk",
-                "--split-per-abi",
-            ],
-            cwd=self.root_dir,
+            ["fastlane", "deploy", "--verbose"],
+            cwd=self.project_dir,
+            env={"ONEXRAY_BUILD_NUMBER": str(self.build_number)},
         )
-        apk_dir = Path(self.root_dir) / "build/app/outputs/flutter-apk"
-        for apk in apk_dir.glob("app-*-release.apk"):
-            abi = apk.stem.replace("app-", "").replace("-release", "")
-            dest = Path(self.output_dir) / f"OneXray-android-{abi}.apk"
-            shutil.copy2(apk, dest)
-        universal_apk = apk_dir / "app-release.apk"
-        universal_dest = Path(self.output_dir) / "OneXray-android-universal.apk"
-        if universal_apk.exists() and not universal_dest.exists():
-            shutil.copy2(universal_apk, universal_dest)
-        aab_path = Path(self.root_dir) / "build/app/outputs/bundle/release/app-release.aab"
-        if aab_path.exists():
-            shutil.copy2(
-                aab_path,
-                self.output_dir,
-            )
+        shutil.copy2(
+            Path(self.root_dir) / "build/app/outputs/bundle/release/app-release.aab",
+            self.output_dir,
+        )
