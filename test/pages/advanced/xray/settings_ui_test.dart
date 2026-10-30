@@ -297,21 +297,24 @@ void main() {
     expect(controller.state.fileExists, isTrue);
   });
 
-  test('XrayRuntimeController toggleAutoRealDelay persists and updates state', () async {
-    final controller = XrayRuntimeController();
-    addTearDown(controller.close);
+  test(
+    'XrayRuntimeController toggleAutoRealDelay persists and updates state',
+    () async {
+      final controller = XrayRuntimeController();
+      addTearDown(controller.close);
 
-    expect(controller.autoRealDelay, isTrue);
-    await controller.toggleAutoRealDelay(false);
-    expect(controller.autoRealDelay, isFalse);
+      expect(controller.autoRealDelay, isTrue);
+      await controller.toggleAutoRealDelay(false);
+      expect(controller.autoRealDelay, isFalse);
 
-    final reloaded = PingState();
-    await reloaded.readFromPreferences();
-    expect(reloaded.autoRealDelay, isFalse);
+      final reloaded = PingState();
+      await reloaded.readFromPreferences();
+      expect(reloaded.autoRealDelay, isFalse);
 
-    await controller.toggleAutoRealDelay(true);
-    expect(controller.autoRealDelay, isTrue);
-  });
+      await controller.toggleAutoRealDelay(true);
+      expect(controller.autoRealDelay, isTrue);
+    },
+  );
 }
 
 final class _PingPreferences extends InMemorySharedPreferencesAsync {

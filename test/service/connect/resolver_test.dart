@@ -179,26 +179,23 @@ void main() {
     },
   );
 
-  test(
-    'when autoRealDelay is disabled, unknown candidates resolve immediately without probing',
-    () async {
-      await (PingState()..autoRealDelay = false).saveToPreferences();
-      final rows = [
-        _row(1, delay: PingDelayConstants.unknown),
-        _row(2, delay: PingDelayConstants.unknown),
-      ];
-      final probes = <List<int>>[];
-      final resolver = ConnectionResolver(
-        rows: () => Stream.value(rows),
-        probe: (ids) async {
-          probes.add(ids);
-        },
-      );
-      final result = await resolver.resolve(ConnectionSettings());
-      expect(probes, isEmpty);
-      expect(result.single.id, 1);
-    },
-  );
+  test('when autoRealDelay is disabled, unknown candidates resolve immediately without probing', () async {
+    await (PingState()..autoRealDelay = false).saveToPreferences();
+    final rows = [
+      _row(1, delay: PingDelayConstants.unknown),
+      _row(2, delay: PingDelayConstants.unknown),
+    ];
+    final probes = <List<int>>[];
+    final resolver = ConnectionResolver(
+      rows: () => Stream.value(rows),
+      probe: (ids) async {
+        probes.add(ids);
+      },
+    );
+    final result = await resolver.resolve(ConnectionSettings());
+    expect(probes, isEmpty);
+    expect(result.single.id, 1);
+  });
 
   test(
     'fully failed or unrepairable candidates do not trigger an endless retry',

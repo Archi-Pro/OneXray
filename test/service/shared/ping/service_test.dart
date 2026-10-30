@@ -614,27 +614,33 @@ void main() {
     }
   });
 
-  test('automatic scheduling is skipped when autoRealDelay is disabled', () async {
-    final node = await db.coreConfigDao.insertRow(_node('Node', subId: 10));
-    await (PingState()..autoRealDelay = false).saveToPreferences();
-    var batchRuns = 0;
-    final service = PingService.forTesting(
-      database: db,
-      automaticEnabled: true,
-      runBatch: (sources, _) async {
-        batchRuns++;
-        return _successes(sources.length);
-      },
-    );
+  test(
+    'automatic scheduling is skipped when autoRealDelay is disabled',
+    () async {
+      final node = await db.coreConfigDao.insertRow(_node('Node', subId: 10));
+      await (PingState()..autoRealDelay = false).saveToPreferences();
+      var batchRuns = 0;
+      final service = PingService.forTesting(
+        database: db,
+        automaticEnabled: true,
+        runBatch: (sources, _) async {
+          batchRuns++;
+          return _successes(sources.length);
+        },
+      );
 
-    service.schedulePingConfigIds([node]);
-    service.schedulePingSubscription(10);
-    service.startAutomatic();
+      service.schedulePingConfigIds([node]);
+      service.schedulePingSubscription(10);
+      service.startAutomatic();
 
-    await Future<void>.delayed(const Duration(milliseconds: 50));
-    expect(batchRuns, 0);
-    expect((await db.coreConfigDao.searchRow(node))!.delay, PingDelayConstants.unknown);
-  });
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      expect(batchRuns, 0);
+      expect(
+        (await db.coreConfigDao.searchRow(node))!.delay,
+        PingDelayConstants.unknown,
+      );
+    },
+  );
 }
 
 List<PingBatchResult> _successes(int count) =>

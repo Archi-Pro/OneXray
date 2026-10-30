@@ -238,8 +238,8 @@ class ConnectionResolver {
         final fallback = settings.selection.kind == SelectionKind.server
             ? candidates
             : candidates
-                .where((candidate) => PingService.isUnmeasured(candidate.row))
-                .toList();
+                  .where((candidate) => PingService.isUnmeasured(candidate.row))
+                  .toList();
         final unmeasuredCandidates = fallback
           ..sort((a, b) => a.row.id.compareTo(b.row.id));
         final eligible = [
