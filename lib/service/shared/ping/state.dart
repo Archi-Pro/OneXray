@@ -44,39 +44,43 @@ class PingState {
   String get realUrl => url == PingUrl.custom ? customUrl : url.url;
 
   Future<void> readFromPreferences() async {
-    final jsonMap = await PreferencesKey().readPingState();
-    if (!EmptyTool.checkMap(jsonMap)) {
-      return;
-    }
-    final pingJson = PingJson.fromJson(jsonMap!);
-    if (pingJson.timeout != null) {
-      var timeout = pingJson.timeout!;
-      if (timeout < PingTimeout.min) {
-        timeout = PingTimeout.min;
-      } else if (timeout > PingTimeout.max) {
-        timeout = PingTimeout.max;
+    try {
+      final jsonMap = await PreferencesKey().readPingState();
+      if (!EmptyTool.checkMap(jsonMap)) {
+        return;
       }
-      this.timeout = timeout;
-    }
-    if (EmptyTool.checkString(pingJson.url)) {
-      final url = PingUrl.fromString(pingJson.url!);
-      if (url != null) {
-        this.url = url;
+      final pingJson = PingJson.fromJson(jsonMap!);
+      if (pingJson.timeout != null) {
+        var timeout = pingJson.timeout!;
+        if (timeout < PingTimeout.min) {
+          timeout = PingTimeout.min;
+        } else if (timeout > PingTimeout.max) {
+          timeout = PingTimeout.max;
+        }
+        this.timeout = timeout;
       }
-    }
-    if (EmptyTool.checkString(pingJson.customUrl)) {
-      customUrl = pingJson.customUrl!;
-    }
-    if (url == PingUrl.custom && !PingUrl.isValidCustomUrl(customUrl)) {
-      url = PingUrl.cloudflare;
-    }
-    if (pingJson.autoRealDelay != null) {
-      autoRealDelay = pingJson.autoRealDelay!;
-    }
+      if (EmptyTool.checkString(pingJson.url)) {
+        final url = PingUrl.fromString(pingJson.url!);
+        if (url != null) {
+          this.url = url;
+        }
+      }
+      if (EmptyTool.checkString(pingJson.customUrl)) {
+        customUrl = pingJson.customUrl!;
+      }
+      if (url == PingUrl.custom && !PingUrl.isValidCustomUrl(customUrl)) {
+        url = PingUrl.cloudflare;
+      }
+      if (pingJson.autoRealDelay != null) {
+        autoRealDelay = pingJson.autoRealDelay!;
+      }
+    } catch (_) {}
   }
 
   Future<void> saveToPreferences() async {
-    final pingJson = PingJson(timeout, url.name, customUrl, autoRealDelay);
-    await PreferencesKey().savePingState(pingJson.toJson());
+    try {
+      final pingJson = PingJson(timeout, url.name, customUrl, autoRealDelay);
+      await PreferencesKey().savePingState(pingJson.toJson());
+    } catch (_) {}
   }
 }
