@@ -108,9 +108,12 @@ class ConnectionResolver {
       );
     }
 
-    final pingState = PingState();
-    await pingState.readFromPreferences();
-    final autoRealDelay = pingState.autoRealDelay;
+    var autoRealDelay = true;
+    try {
+      final pingState = PingState();
+      await pingState.readFromPreferences();
+      autoRealDelay = pingState.autoRealDelay;
+    } catch (_) {}
 
     final result = Completer<ResolvedConnectionTarget>();
     StreamSubscription<List<CoreConfigData>>? subscription;

@@ -72,9 +72,11 @@ class PingService {
   void stopAutomatic() => _automaticEnabled = false;
 
   Future<void> _scheduleUnmeasured() async {
-    final pingState = PingState();
-    await pingState.readFromPreferences();
-    if (!pingState.autoRealDelay) return;
+    try {
+      final pingState = PingState();
+      await pingState.readFromPreferences();
+      if (!pingState.autoRealDelay) return;
+    } catch (_) {}
     final ids = await _database.coreConfigDao.unmeasuredOutboundIds;
     schedulePingConfigIds(ids);
   }
@@ -100,9 +102,11 @@ class PingService {
     }
     return _enqueuePing(() async {
       if (!force) {
-        final pingState = PingState();
-        await pingState.readFromPreferences();
-        if (!pingState.autoRealDelay) return;
+        try {
+          final pingState = PingState();
+          await pingState.readFromPreferences();
+          if (!pingState.autoRealDelay) return;
+        } catch (_) {}
       }
       final db = _database;
       final rows = <CoreConfigData>[];
@@ -134,9 +138,11 @@ class PingService {
     for (final subId in targetSubIds) {
       unawaited(
         _enqueuePing(() async {
-          final pingState = PingState();
-          await pingState.readFromPreferences();
-          if (!pingState.autoRealDelay) return;
+          try {
+            final pingState = PingState();
+            await pingState.readFromPreferences();
+            if (!pingState.autoRealDelay) return;
+          } catch (_) {}
           final db = _database;
           final rows = (await db.coreConfigDao.allOutboundRowsWithDataBySubId(
             subId,
