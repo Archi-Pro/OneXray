@@ -626,6 +626,8 @@
   "prototypeUpdateTimingNotice": "達到週期且 App 可以執行任務時檢查更新，不保證精確的背景定時。關閉自動更新後，仍可手動更新。",
   "prototypeSpeedTest": "測速",
   "prototypeSpeedTestSummary": "逾時與測速 URL",
+  "autoRealDelayTitle": "自動測速",
+  "autoRealDelaySubtitle": "在更新訂閱和連線時自動測試伺服器延遲。",
   "prototypeTimeout": "逾時",
   "prototypeTimeoutHint": "測速超過此時間限制時，會標記為逾時。",
   "prototypeSpeedTestUrl": "測速 URL",

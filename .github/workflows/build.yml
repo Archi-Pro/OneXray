@@ -449,9 +449,16 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
+          name: android-apks
+          path: output/OneXray-android-*.apk
+          if-no-files-found: error
+
+      - name: Upload universal artifact
+        uses: actions/upload-artifact@v7
+        with:
           name: android-universal
           path: output/OneXray-android-universal*.apk
-          if-no-files-found: error
+          if-no-files-found: warn
 
   # =================================================================
   # Windows x64 and arm64 × EXE / MSIX.

@@ -626,6 +626,8 @@
   "prototypeUpdateTimingNotice": "达到周期且 App 可以执行任务时检查更新，不保证精确的后台定时。关闭自动更新后，仍可手动更新。",
   "prototypeSpeedTest": "测速",
   "prototypeSpeedTestSummary": "超时与测速 URL",
+  "autoRealDelayTitle": "自动测速",
+  "autoRealDelaySubtitle": "在更新订阅和连接时自动测试服务器延迟。",
   "prototypeTimeout": "超时",
   "prototypeTimeoutHint": "测速超过此时长时，标记为超时。",
   "prototypeSpeedTestUrl": "测速 URL",

@@ -39,7 +39,7 @@ android {
         if (!splitPerAbi) {
             ndk {
                 abiFilters.clear()
-                abiFilters += listOf("arm64-v8a", "x86_64")
+                abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64", "x86")
             }
         }
     }
@@ -49,8 +49,8 @@ android {
             abi {
                 reset()
                 isEnable = true
-                isUniversalApk = false
-                include("arm64-v8a", "x86_64")
+                isUniversalApk = true
+                include("arm64-v8a", "armeabi-v7a", "x86_64", "x86")
             }
         }
     }

@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:onexray/core/constants/preferences.dart';
 import 'package:onexray/l10n/localizations/app_localizations.dart';
 import 'package:onexray/service/settings/language/locale.dart';
+import 'package:onexray/pages/advanced/xray/controller.dart';
 import 'package:onexray/pages/advanced/xray/log/controller.dart';
 import 'package:onexray/pages/advanced/xray/log/params.dart';
 import 'package:onexray/pages/advanced/xray/ping/page.dart';
@@ -294,6 +295,22 @@ void main() {
 
     expect(controller.state.lines, ['first line', 'second line']);
     expect(controller.state.fileExists, isTrue);
+  });
+
+  test('XrayRuntimeController toggleAutoRealDelay persists and updates state', () async {
+    final controller = XrayRuntimeController();
+    addTearDown(controller.close);
+
+    expect(controller.autoRealDelay, isTrue);
+    await controller.toggleAutoRealDelay(false);
+    expect(controller.autoRealDelay, isFalse);
+
+    final reloaded = PingState();
+    await reloaded.readFromPreferences();
+    expect(reloaded.autoRealDelay, isFalse);
+
+    await controller.toggleAutoRealDelay(true);
+    expect(controller.autoRealDelay, isTrue);
   });
 }
 

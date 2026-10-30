@@ -27,6 +27,7 @@ class XrayRuntimePageState {
   final Map<String, dynamic> log;
   final double pingTimeout;
   final PingUrl pingUrl;
+  final bool autoRealDelay;
   final String xrayVersion;
   final String uptime;
   final bool loading;
@@ -43,6 +44,7 @@ class XrayRuntimePageState {
     Map<String, dynamic> log = const {},
     this.pingTimeout = PingTimeout.defaultValue,
     this.pingUrl = PingUrl.cloudflare,
+    this.autoRealDelay = true,
     this.xrayVersion = '—',
     this.uptime = '—',
     this.loading = true,
@@ -60,6 +62,7 @@ class XrayRuntimePageState {
     Map<String, dynamic>? log,
     double? pingTimeout,
     PingUrl? pingUrl,
+    bool? autoRealDelay,
     String? xrayVersion,
     String? uptime,
     bool? loading,
@@ -79,6 +82,7 @@ class XrayRuntimePageState {
     log: log ?? this.log,
     pingTimeout: pingTimeout ?? this.pingTimeout,
     pingUrl: pingUrl ?? this.pingUrl,
+    autoRealDelay: autoRealDelay ?? this.autoRealDelay,
     xrayVersion: xrayVersion ?? this.xrayVersion,
     uptime: uptime ?? this.uptime,
     loading: loading ?? this.loading,
@@ -175,6 +179,7 @@ class XrayRuntimeController extends PageCubit<XrayRuntimePageState> {
           systemExtension: systemExtension,
           pingTimeout: preferences.timeout,
           pingUrl: preferences.url,
+          autoRealDelay: preferences.autoRealDelay,
           runtime: reader.state.runtime.runtime ?? currentRuntime,
         ),
       );
@@ -183,6 +188,16 @@ class XrayRuntimeController extends PageCubit<XrayRuntimePageState> {
     } finally {
       emit(state.copyWith(loading: false));
     }
+  }
+
+  bool get autoRealDelay => state.autoRealDelay;
+
+  Future<void> toggleAutoRealDelay(bool value) async {
+    emit(state.copyWith(autoRealDelay: value));
+    final pingState = PingState();
+    await pingState.readFromPreferences();
+    pingState.autoRealDelay = value;
+    await pingState.saveToPreferences();
   }
 
   void setLog(String key, Object value) {

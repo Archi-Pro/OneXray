@@ -39,6 +39,7 @@ class PingState {
   var timeout = PingTimeout.defaultValue;
   var url = PingUrl.cloudflare;
   var customUrl = "";
+  var autoRealDelay = true;
 
   String get realUrl => url == PingUrl.custom ? customUrl : url.url;
 
@@ -69,10 +70,13 @@ class PingState {
     if (url == PingUrl.custom && !PingUrl.isValidCustomUrl(customUrl)) {
       url = PingUrl.cloudflare;
     }
+    if (pingJson.autoRealDelay != null) {
+      autoRealDelay = pingJson.autoRealDelay!;
+    }
   }
 
   Future<void> saveToPreferences() async {
-    final pingJson = PingJson(timeout, url.name, customUrl);
+    final pingJson = PingJson(timeout, url.name, customUrl, autoRealDelay);
     await PreferencesKey().savePingState(pingJson.toJson());
   }
 }

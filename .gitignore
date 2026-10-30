@@ -98,3 +98,4 @@ macos_se/fastlane/AuthKey.p8
 # ai
 .cursor/
 .ai/
+.codegraph/

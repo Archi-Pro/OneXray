@@ -6,6 +6,7 @@ import 'package:onexray/core/db/database/enum.dart';
 import 'package:onexray/service/connect/compiler.dart';
 import 'package:onexray/service/connect/settings.dart';
 import 'package:onexray/service/shared/ping/service.dart';
+import 'package:onexray/service/shared/ping/state.dart';
 import 'package:onexray/service/connect/routing/custom/configuration.dart';
 
 enum ConnectionResolutionFailure {
@@ -106,6 +107,10 @@ class ConnectionResolver {
         ConnectionResolutionFailure.selfReference,
       );
     }
+
+    final pingState = PingState();
+    await pingState.readFromPreferences();
+    final autoRealDelay = pingState.autoRealDelay;
 
     final result = Completer<ResolvedConnectionTarget>();
     StreamSubscription<List<CoreConfigData>>? subscription;
@@ -229,7 +234,28 @@ class ConnectionResolver {
         );
         return;
       }
-      if (finalRead) {
+      if (!autoRealDelay) {
+        final fallback = settings.selection.kind == SelectionKind.server
+            ? candidates
+            : candidates
+                .where((candidate) => PingService.isUnmeasured(candidate.row))
+                .toList();
+        final unmeasuredCandidates = fallback
+          ..sort((a, b) => a.row.id.compareTo(b.row.id));
+        final eligible = [
+          ...successful,
+          ...unmeasuredCandidates.where((c) => !successful.contains(c)),
+        ];
+        if (eligible.length >= required) {
+          result.complete(
+            ResolvedConnectionTarget.entries(
+              eligible.take(required).map((candidate) => candidate.server),
+            ),
+          );
+          return;
+        }
+      }
+      if (finalRead || !autoRealDelay) {
         unavailable(
           ConnectionResolutionFailure.insufficientHealthyServers,
           successful.length,

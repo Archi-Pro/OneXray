@@ -1889,6 +1889,14 @@
   "@prototypeSpeedTestSummary": {
     "description": "Summary of the speed test settings page."
   },
+  "autoRealDelayTitle": "Auto real delay",
+  "@autoRealDelayTitle": {
+    "description": "Title for automatic delay testing toggle in Xray advanced settings"
+  },
+  "autoRealDelaySubtitle": "Automatically measure server latency on subscription update and connection.",
+  "@autoRealDelaySubtitle": {
+    "description": "Subtitle describing auto real delay behavior"
+  },
   "prototypeTimeout": "Timeout",
   "@prototypeTimeout": {
     "description": "Approved prototype copy: Timeout"

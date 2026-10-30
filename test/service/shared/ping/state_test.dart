@@ -82,8 +82,21 @@ void main() {
     await restored.saveToPreferences();
     expect(
       (await PreferencesKey().readPingState())!.keys,
-      unorderedEquals(['timeout', 'url', 'customUrl']),
+      unorderedEquals(['timeout', 'url', 'customUrl', 'autoRealDelay']),
     );
+  });
+
+  test('autoRealDelay defaults to true and round trips', () async {
+    final state = PingState();
+    await state.readFromPreferences();
+    expect(state.autoRealDelay, isTrue);
+
+    state.autoRealDelay = false;
+    await state.saveToPreferences();
+
+    final restored = PingState();
+    await restored.readFromPreferences();
+    expect(restored.autoRealDelay, isFalse);
   });
 
   test('invalid legacy custom URLs are retained but not activated', () async {

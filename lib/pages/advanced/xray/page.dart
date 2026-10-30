@@ -177,6 +177,34 @@ class XrayRuntimePage extends StatelessWidget {
                                 enabled: true,
                                 onTap: () => onSpeedTest(context),
                               ),
+                              SettingRow(
+                                title: l.autoRealDelayTitle,
+                                subtitle: l.autoRealDelaySubtitle,
+                                titleStyle: mobile
+                                    ? AppTypography.settingsFieldTitle
+                                    : AppTypography.settingsRow,
+                                subtitleStyle: mobile
+                                    ? AppTypography.runtimePushHint
+                                    : AppTypography.runtimeDesktopPushHint,
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: mobile ? 10 : 16,
+                                  vertical: 10,
+                                ),
+                                minHeight: 64,
+                                decorateLeading: false,
+                                leading: Icon(
+                                  LucideIcons.timerReset,
+                                  size: 19,
+                                  color: ColorManager.palette(context).primary,
+                                ),
+                                trailing: ShadSwitch(
+                                  key: const ValueKey('auto-real-delay-switch'),
+                                  value: state.autoRealDelay,
+                                  enabled: !disabled && !controller.busy,
+                                  onChanged: (value) =>
+                                      controller.toggleAutoRealDelay(value),
+                                ),
+                              ),
                               if (onServerDialing != null)
                                 _pushRow(
                                   context,

@@ -3,13 +3,24 @@ import 'dart:convert';
 
 import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:flutter_test/flutter_test.dart';
+import 'package:onexray/core/constants/preferences.dart';
 import 'package:onexray/core/db/database/constants.dart';
 import 'package:onexray/core/db/database/database.dart';
 import 'package:onexray/service/connect/resolver.dart';
 import 'package:onexray/service/connect/settings.dart';
 import 'package:onexray/service/connect/routing/custom/state.dart';
+import 'package:onexray/service/shared/ping/state.dart';
+// ignore: depend_on_referenced_packages
+import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
+// ignore: depend_on_referenced_packages
+import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 
 void main() {
+  setUp(() async {
+    SharedPreferencesAsyncPlatform.instance =
+        InMemorySharedPreferencesAsync.empty();
+    await PreferencesKey().clearUserDataPreferences();
+  });
   test(
     'unknown selection kinds use the default while known fields are checked',
     () {
@@ -164,6 +175,27 @@ void main() {
       expect(probes, [
         [1, 2],
       ]);
+      expect(result.single.id, 1);
+    },
+  );
+
+  test(
+    'when autoRealDelay is disabled, unknown candidates resolve immediately without probing',
+    () async {
+      await (PingState()..autoRealDelay = false).saveToPreferences();
+      final rows = [
+        _row(1, delay: PingDelayConstants.unknown),
+        _row(2, delay: PingDelayConstants.unknown),
+      ];
+      final probes = <List<int>>[];
+      final resolver = ConnectionResolver(
+        rows: () => Stream.value(rows),
+        probe: (ids) async {
+          probes.add(ids);
+        },
+      );
+      final result = await resolver.resolve(ConnectionSettings());
+      expect(probes, isEmpty);
       expect(result.single.id, 1);
     },
   );

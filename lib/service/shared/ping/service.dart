@@ -72,13 +72,21 @@ class PingService {
   void stopAutomatic() => _automaticEnabled = false;
 
   Future<void> _scheduleUnmeasured() async {
+    final pingState = PingState();
+    await pingState.readFromPreferences();
+    if (!pingState.autoRealDelay) return;
     final ids = await _database.coreConfigDao.unmeasuredOutboundIds;
     schedulePingConfigIds(ids);
   }
 
   void schedulePingConfigIds(List<int> ids) {
     if (!_automaticEnabled || _pingQueue.isPaused) return;
-    unawaited(pingConfigIds(ids));
+    unawaited(() async {
+      final pingState = PingState();
+      await pingState.readFromPreferences();
+      if (!pingState.autoRealDelay) return;
+      await pingConfigIds(ids);
+    }());
   }
 
   /// Shares the existing serialized queue with automatic imports. Each batch
@@ -123,17 +131,21 @@ class PingService {
         .where((id) => id > DBConstants.defaultId)
         .toSet()
         .toList(growable: false);
-    for (final subId in targetSubIds) {
-      unawaited(
-        _enqueuePing(() async {
+    if (targetSubIds.isEmpty) return;
+    unawaited(() async {
+      final pingState = PingState();
+      await pingState.readFromPreferences();
+      if (!pingState.autoRealDelay) return;
+      for (final subId in targetSubIds) {
+        await _enqueuePing(() async {
           final db = _database;
           final rows = (await db.coreConfigDao.allOutboundRowsWithDataBySubId(
             subId,
           )).where(isUnmeasured).toList();
           if (rows.isNotEmpty) await _pingConfigs(db, rows);
-        }),
-      );
-    }
+        });
+      }
+    }());
   }
 
   Future<void> _enqueuePing(Future<void> Function() task) {
